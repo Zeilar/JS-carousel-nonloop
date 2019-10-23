@@ -1,0 +1,169 @@
+<meta charset=utf-8>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Bar-B-Ko</title>
+	<link rel="icon" href="assets/images/favicon.png" type="image/carouselX-icon">
+	<script type="text/javascript" src="https://www.bokabord.se/widget.min.js"></script>
+	<script 
+		integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU"
+		src="https://code.jquery.com/jquery-3.4.1.js"
+		crossorigin="anonymous"
+	>
+	</script>
+	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBEtv59AyrcIkl57U8R8udJB1t57ACHfxM"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/2.0.2/anime.min.js"></script>
+
+<div class="carousel">
+	<div class="carousel-items">
+		<div class="carousel-item active"><h1>0</h1></div>
+		<div class="carousel-item"><h1>1</h1></div>
+		<div class="carousel-item"><h1>2</h1></div>
+		<div class="carousel-item"><h1>3</h1></div>
+		<div class="carousel-item"><h1>4</h1></div>
+	</div>
+	
+	<div class="indicators"><!-- filled with Javascript --></div>
+</div>
+
+<button class="previous">Previous</button>
+<button class="next">Next</button>
+
+<style>
+
+	* {
+		text-align: center;
+	}
+
+	body {
+		background: gray;
+		margin: 0;
+	}
+
+	ul {
+		list-style: none;
+		display: flex;
+		justify-content: center;
+	}
+
+	li {
+		margin: 0 10px;
+	}
+
+	button {
+		width: 100px;
+		height: 100px;
+		margin-top: 100px;
+	}
+
+	.carousel-items {
+		transition: all 0.25s linear;
+		background: green;
+		height: fit-content;
+		width: fit-content;
+		margin: auto;
+		margin-top: 40vh;
+		display: flex;
+	}
+
+	.carousel-item {
+		width: 10em;
+		height: 10em;
+		background: rgba(0, 0, 0, 0.5);
+	}
+
+	.indicators {
+		background: cyan;
+	}
+
+	.active {
+		background: yellow;
+	}
+</style>
+
+<script>
+
+let indicators = '';
+for (let i = 0; i < $('.carousel-item').length; i++) {
+	if (i === 0) {
+		indicators += `
+			<li class="indicator active" data-index="${i}">Item ${i}</li>
+		`;
+	} else {
+		indicators += `
+			<li class="indicator" data-index="${i}">Item ${i}</li>
+		`;
+	}
+}
+
+console.log(indicators);
+
+
+$('.indicators').append(`
+	<ul>
+		${indicators}
+	</ul>
+`)
+.css({
+	'width': `${$('.carousel-items').width()}`,
+	'margin': 'auto'
+});
+
+
+$('.carousel-item').each(function(i) {
+	$(this).attr('data-index', `${i}`);	
+});
+
+
+let carouselMedian = Math.floor($('.carousel-item').length / 2);
+let currentSlide = 0;
+let carouselX;
+$('.carousel-item').each(function() {
+	$('.carousel-items').attr('style', `transform: translateX(${$('.carousel-item').width() * carouselMedian}px);`);
+	carouselX = $('.carousel-item').width() * carouselMedian;
+});
+
+
+$('.next').click(function() {
+	nextSlide();
+});
+$('.previous').click(function() {
+	prevSlide();
+});
+
+$('.indicator').click(function() {
+	$('.indicator').removeClass('active');
+	$(this).addClass('active')
+
+	let current = parseInt($('.active').attr('data-index'));
+	let target = parseInt($(this).attr('data-index'));
+
+	if (target > current) {
+		nextSlide(target - current);
+	} else if (target < current) {
+		prevSlide(current - target);
+	}
+	
+});
+
+
+function nextSlide(slides = 1) {
+	if (currentSlide > $('.carousel-item').length - 2) {
+		return false;
+	}
+	currentSlide += slides;	
+	carouselX -= $('.carousel-item').width() * slides;
+	$('.carousel-item.active, .indicator.active').removeClass('active');
+	$(`.carousel-item[data-index="${currentSlide}"], .indicator[data-index="${currentSlide}"]`).addClass('active');			
+	$('.carousel-items').attr('style', `transform: translateX(${carouselX}px);`);
+}
+
+function prevSlide(slides = 1) {	
+	if (currentSlide <= 0) {
+		return false;
+	}
+	currentSlide -= slides;	
+	carouselX += $('.carousel-item').width() * slides;
+	$('.carousel-item.active, .indicator.active').removeClass('active');
+	$(`.carousel-item[data-index="${currentSlide}"], .indicator[data-index="${currentSlide}"]`).addClass('active');
+	$('.carousel-items').attr('style', `transform: translateX(${carouselX}px);`);
+}
+</script>
